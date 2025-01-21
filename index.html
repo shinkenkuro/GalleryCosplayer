@@ -29,7 +29,6 @@
     </button>
   </header>
 
-  <!-- Test -->
   <!-- Main Content -->
   <div class="flex-1 my-10 overflow-y-auto xl:pl-64 xl:pt-0 pt-10 mx-10">
     <!-- Folder List -->
@@ -65,17 +64,8 @@
     <div class="p-6">
       <h2 class="text-2xl font-bold mb-6 text-center">Cosplayer Viewer</h2>
       <nav>
-        <ul class="space-y-4">
-          <li>
-            <button id="haneameBtn" class="cosplayerButton w-full text-left bg-gray-700 hover:bg-gray-600 p-3 rounded">
-              HaneAme
-            </button>
-          </li>
-          <li>
-            <button id="fantasyFactoryBtn" class="cosplayerButton w-full text-left bg-gray-700 hover:bg-gray-600 p-3 rounded">
-              Fantasy Factory
-            </button>
-          </li>
+        <ul id="cosplayer-list" class="space-y-4">
+          <!-- Tombol akan di-generate di sini -->
         </ul>
       </nav>
     </div>
@@ -126,6 +116,7 @@
       });
     });
   </script>
+
   <script src="script.js"></script>
 </body>
 </html>
