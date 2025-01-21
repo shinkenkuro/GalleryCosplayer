@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cosplayer Viewer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Menyembunyikan header saat scroll ke bawah */
+    .hide-header {
+      transform: translateY(-100%);
+      transition: transform 0.3s ease;
+    }
+
+    .show-header {
+      transform: translateY(0);
+      transition: transform 0.3s ease;
+    }
+  </style>
+</head>
+<body class="bg-gray-900 text-white">
+
+  <!-- Header Container (Tombol Hamburger) -->
+  <header id="header" class="absolute top-0 left-0 right-0 z-50 bg-gray-900">
+    <button id="hamburger" class="md:hidden p-4 text-white">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+      </svg>
+    </button>
+  </header>
+
+  <!-- Main Content -->
+  <div class="flex-1 my-10 overflow-y-auto xl:pl-64 xl:pt-0 pt-10 mx-10">
+    <!-- Folder List -->
+    <div id="folderList" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mb-8"></div>
+
+    <!-- Image Grid (Initially Hidden) -->
+    <div id="imageGrid" class="hidden">
+      <button id="backBtn" class="bg-blue-500 p-2 rounded mb-4">Back to Folders</button>
+      <div id="grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-6"></div>
+    </div>
+
+    <!-- Slideshow Overlay -->
+    <div id="slideshowOverlay" class="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center hidden">
+      <div class="relative w-full max-w-4xl p-4">
+        <!-- Close Button -->
+        <button id="closeSlideshow" class="absolute top-2 right-2 text-white text-2xl z-10">X</button>
+
+        <!-- Slideshow Content -->
+        <div id="slideshowContent" class="flex justify-center items-center relative"></div>
+
+        <!-- Filename -->
+        <p id="imageFilename" class="text-center mt-2 text-sm text-white"></p>
+
+        <!-- Navigation Buttons -->
+        <button id="prevBtn" class="text-white text-4xl absolute left-4 sm:left-10 z-10">&#10094;</button>
+        <button id="nextBtn" class="text-white text-4xl absolute right-4 sm:right-10 z-10">&#10095;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="bg-gray-800 fixed top-0 left-0 h-full md:w-64 w-3/4 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out z-40">
+    <div class="p-6">
+      <h2 class="text-2xl font-bold mb-6 text-center">Cosplayer Viewer</h2>
+      <nav>
+        <ul class="space-y-4">
+          <li>
+            <button id="haneameBtn" class="cosplayerButton w-full text-left bg-gray-700 hover:bg-gray-600 p-3 rounded">
+              HaneAme
+            </button>
+          </li>
+          <li>
+            <button id="fantasyFactoryBtn" class="cosplayerButton w-full text-left bg-gray-700 hover:bg-gray-600 p-3 rounded">
+              Fantasy Factory
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- JavaScript -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('overlay');
+      const hamburger = document.getElementById('hamburger');
+      const header = document.getElementById('header');
+
+      // Toggle Sidebar and Overlay
+      const toggleSidebar = () => {
+        sidebar.classList.toggle('-translate-x-full');
+        overlay.classList.toggle('hidden');
+      };
+
+      // Event Listeners for Hamburger Button
+      hamburger.addEventListener('click', toggleSidebar);
+      overlay.addEventListener('click', toggleSidebar);
+
+      // Scroll Event to Hide/Show Header
+      let lastScrollTop = 0;
+      window.addEventListener('scroll', () => {
+        let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        if (scrollTop > lastScrollTop) {
+          // Scroll Down - Hide Header
+          header.classList.remove('show-header');
+          header.classList.add('hide-header');
+        } else {
+          // Scroll Up - Show Header
+          header.classList.remove('hide-header');
+          header.classList.add('show-header');
+        }
+        lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; // Prevent negative scroll
+      });
+
+      // Close sidebar when resizing to large screens
+      window.addEventListener('resize', () => {
+        if (window.innerWidth >= 768) {
+          sidebar.classList.remove('-translate-x-full');
+          overlay.classList.add('hidden');
+        } else {
+          sidebar.classList.add('-translate-x-full');
+        }
+      });
+    });
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>
