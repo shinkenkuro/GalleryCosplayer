@@ -1,4 +1,10 @@
 {
-    "folders": [],
-    "images": {}
+    "folders": [
+        "test"
+    ],
+    "images": {
+        "test": [
+            "test [test] (video)"
+        ]
+    }
 }
