@@ -191,23 +191,3 @@ document.getElementById('prevBtn').addEventListener('click', () => {
 document.getElementById('closeSlideshow').addEventListener('click', () => {
   slideshowOverlay.classList.add('hidden');
 });
-
-// Detect click on slideshowOverlay to navigate slides
-slideshowOverlay.addEventListener('click', (event) => {
-  const overlayWidth = slideshowOverlay.offsetWidth;
-  const clickX = event.clientX;
-
-  if (clickX < overlayWidth / 2) {
-    // Klik di sisi kiri layar, navigasi ke slide sebelumnya
-    currentIndex = (currentIndex - 1 + currentMedia.length) % currentMedia.length;
-  } else {
-    // Klik di sisi kanan layar, navigasi ke slide berikutnya
-    currentIndex = (currentIndex + 1) % currentMedia.length;
-  }
-  showSlideshow();
-});
-
-// Prevent click propagation inside slideshow content
-slideshowContent.addEventListener('click', (event) => {
-  event.stopPropagation();
-});
