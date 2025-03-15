@@ -2,6 +2,7 @@ const folderList = document.getElementById('folderList');
 const imageGrid = document.getElementById('imageGrid');
 const grid = document.getElementById('grid');
 const backBtn = document.getElementById('backBtn');
+const shuffleBtn = document.getElementById('shuffleBtn');
 const slideshowOverlay = document.getElementById('slideshowOverlay');
 const slideshowContent = document.getElementById('slideshowContent');
 const filename = document.getElementById('imageFilename');
@@ -35,6 +36,12 @@ function generateButtons() {
 // Initial call to generate the cosplayer buttons
 generateButtons();
 
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
 // Function to load cosplayer data from JSON file
 function loadCosplayer(jsonFile) {
   fetch(jsonFile)
@@ -96,8 +103,13 @@ function showMedia(folder, jsonData) {
     imageGrid.classList.add('hidden');
   });
 
-  const media = jsonData.images[folder];
-  grid.innerHTML = ''; // Clear any existing content
+  currentMedia = jsonData.images[folder];
+  renderMediaGrid(currentMedia);
+}
+
+// Function to render media grid
+function renderMediaGrid(media) {
+  grid.innerHTML = ''; // Clear existing content
 
   media.forEach((mediaData, index) => {
     const { url, title, type } = parseMediaData(mediaData);
@@ -125,6 +137,13 @@ function showMedia(folder, jsonData) {
     grid.appendChild(mediaDiv);
   });
 }
+
+// Event listener for shuffle button
+shuffleBtn.addEventListener('click', () => {
+  shuffleArray(currentMedia);
+  renderMediaGrid(currentMedia);
+});
+
 
 // Function to parse media data and extract URL, title, and type
 function parseMediaData(mediaData) {

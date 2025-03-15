@@ -46,12 +46,13 @@
     <!-- Image Grid (Initially Hidden) -->
     <div id="imageGrid" class="hidden">
       <button id="backBtn" class="bg-blue-500 p-2 rounded mb-4">Back to Folders</button>
+      <button id="shuffleBtn" class="bg-green-500 p-2 rounded mb-4">Shuffle Media</button>
       <div id="grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-6"></div>
     </div>
 
     <!-- Slideshow Overlay -->
     <div id="slideshowOverlay" class="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center hidden">
-      <div class="relative w-full max-w-4xl p-4">
+      <div class="relative w-full max-w-xl p-4">
         <!-- Close Button -->
         <button id="closeSlideshow" class="absolute top-2 right-2 text-white text-2xl z-10">X</button>
 
@@ -124,6 +125,31 @@
         }
       });
     });
+
+    function updateButtonPosition() {
+      const isMobile = window.innerWidth <= 640; // Sesuaikan breakpoint sesuai kebutuhan
+      const closeBtn = document.getElementById('closeSlideshow');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const slideshowContent = document.getElementById('slideshowContent');
+
+      if (isMobile) {
+        prevBtn.classList.add('absolute', 'left-4', 'top-1/2', 'transform', '-translate-y-1/2', 'px-4');
+        prevBtn.classList.remove('right-0');
+        nextBtn.classList.add('absolute', 'right-4', 'top-1/2', 'transform', '-translate-y-1/2', 'px-4');
+        nextBtn.classList.remove('left-0');
+        closeBtn.classList.add('relative', 'mt-4', 'block', 'mx-auto');
+      } else {
+        prevBtn.classList.remove('absolute', 'left-4', 'top-1/2', 'transform', '-translate-y-1/2', 'px-4');
+        prevBtn.classList.add('absolute', 'left-10');
+        nextBtn.classList.remove('absolute', 'right-4', 'top-1/2', 'transform', '-translate-y-1/2', 'px-4');
+        nextBtn.classList.add('absolute', 'right-10');
+        closeBtn.classList.remove('relative', 'mt-4', 'block', 'mx-auto');
+      }
+    }
+
+    window.addEventListener('resize', updateButtonPosition);
+    document.addEventListener('DOMContentLoaded', updateButtonPosition);
   </script>
 
   <script src="script.js"></script>
