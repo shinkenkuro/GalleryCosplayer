@@ -44,9 +44,20 @@ function shuffleArray(array) {
 }
 // Function to load cosplayer data from JSON file
 function loadCosplayer(jsonFile) {
+  const cachedData = localStorage.getItem(jsonFile);
+  if (cachedData) {
+    const jsonData = JSON.parse(cachedData);
+    populateFolders(jsonData);
+    setupSortListener(jsonData); // Setup sorting options after loading data
+    return;
+  }
+
   fetch(jsonFile)
+
     .then(response => response.json())
     .then(jsonData => {
+      localStorage.setItem(jsonFile, JSON.stringify(jsonData));
+
       populateFolders(jsonData);
       setupSortListener(jsonData); // Setup sorting options after loading data
     })
