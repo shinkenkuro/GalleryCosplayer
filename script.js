@@ -13,7 +13,7 @@ let currentMedia = [];
 // Generate buttons for cosplayer data dynamically
 function generateButtons() {
   const dataDir = 'data/';
-  const fileList = ['haneame.json', 'fantasyfactory.json', 'Aqua水淼.json', '霜月Shimo.json']; // Add your file names here
+  const fileList = ['haneame.json', 'fantasyfactory.json', 'Aqua水淼.json', '霜月Shimo.json', 'doujin.json']; // Add your file names here
 
   const cosplayerList = document.getElementById('cosplayer-list');
   cosplayerList.innerHTML = ''; // Clear any existing buttons
