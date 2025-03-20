@@ -196,6 +196,7 @@ function renderMediaGrid(media) {
     mediaDiv.addEventListener('click', () => openSlideshow(index, media));
     grid.appendChild(mediaDiv);
   });
+  window.currentMedia = media;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -214,11 +215,10 @@ document.addEventListener("DOMContentLoaded", () => {
       let originalUrl = img.dataset.originalUrl;
       if (isCurrentlyMD) {
         img.src = originalUrl.replace(/\.md(\.[a-zA-Z0-9]+)$/, "$1");
-        img.dataset.originalUrl = img.src;
       } else {
         img.src = originalUrl.replace(/(\.[a-zA-Z0-9]+)$/, ".md$1");
-        img.dataset.originalUrl = img.src;
       }
+      img.dataset.originalUrl = img.src;
     });
     
     toggleAllBtn.textContent = isCurrentlyMD ? "Change to MD" : "Change to HD";
@@ -249,31 +249,27 @@ function parseMediaData(mediaData) {
 }
 
 // Function to open slideshow with selected media
-function openSlideshow(index, media) {
+function openSlideshow(index) {
   currentIndex = index;
-  currentMedia = media;
   showSlideshow();
 }
 
-// Function to show the current media in slideshow mode
 function showSlideshow() {
-  if (!currentMedia || currentIndex < 0 || currentIndex >= currentMedia.length) return;
+  if (!window.currentMedia || currentIndex < 0 || currentIndex >= window.currentMedia.length) return;
 
-  const { url, title, type } = parseMediaData(currentMedia[currentIndex]);
+  const gridImages = document.querySelectorAll("#grid img");
+  const currentImage = gridImages[currentIndex];
+  const updatedUrl = currentImage ? currentImage.src : parseMediaData(window.currentMedia[currentIndex]).url;
+
   slideshowContent.innerHTML = ''; // Clear previous content
 
-  let mediaElement;
-  if (type === 'video') {
-    mediaElement = createVideoElement(url);
-  } else {
-    mediaElement = document.createElement('img');
-    mediaElement.classList.add('max-w-full', 'rounded-lg');
-    mediaElement.src = url;
-    mediaElement.alt = title || `Media ${currentIndex + 1}`;
-  }
+  let mediaElement = document.createElement('img');
+  mediaElement.classList.add('max-w-full', 'rounded-lg');
+  mediaElement.src = updatedUrl;
+  mediaElement.alt = `Media ${currentIndex + 1}`;
 
   slideshowContent.appendChild(mediaElement);
-  filename.innerText = title || `Media ${currentIndex + 1}`;
+  filename.innerText = `Media ${currentIndex + 1}`;
   slideshowOverlay.classList.remove('hidden');
 }
 
