@@ -129,23 +129,24 @@
     });
 
     function updateButtonPosition() {
-    const isMobile = window.innerWidth <= 640; // Sesuaikan breakpoint sesuai kebutuhan
+    const isMobile = window.innerWidth <= 640; // Cek jika dalam mode mobile
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
 
     if (isMobile) {
-      // Tombol sebagai overlay di samping kiri dan kanan
-      prevBtn.classList.add('absolute', 'left-0', 'top-0', 'h-full', 'w-[10%]', 'bg-black', 'bg-opacity-30', 'flex', 'items-center', 'justify-center');
-      prevBtn.classList.remove('text-4xl', 'left-4', 'sm:left-10');
-
-      nextBtn.classList.add('absolute', 'right-0', 'top-0', 'h-full', 'w-[10%]', 'bg-black', 'bg-opacity-30', 'flex', 'items-center', 'justify-center');
+      // Pindahkan nextBtn ke kiri
+      nextBtn.classList.add('absolute', 'left-0', 'top-0', 'h-full', 'w-[10%]', 'bg-black', 'bg-opacity-30', 'flex', 'items-center', 'justify-center');
       nextBtn.classList.remove('text-4xl', 'right-4', 'sm:right-10');
+
+      // Pindahkan prevBtn ke kanan
+      prevBtn.classList.add('absolute', 'right-0', 'top-0', 'h-full', 'w-[10%]', 'bg-black', 'bg-opacity-30', 'flex', 'items-center', 'justify-center');
+      prevBtn.classList.remove('text-4xl', 'left-4', 'sm:left-10');
     } else {
-      // Kembalikan ke tampilan desktop
-      prevBtn.classList.remove('absolute', 'left-0', 'top-0', 'h-full', 'w-[10%]', 'bg-black', 'bg-opacity-30', 'flex', 'items-center', 'justify-center');
+      // Kembalikan ke posisi desktop
+      prevBtn.classList.remove('absolute', 'right-0', 'top-0', 'h-full', 'w-[10%]', 'bg-black', 'bg-opacity-30', 'flex', 'items-center', 'justify-center');
       prevBtn.classList.add('text-4xl', 'left-10');
 
-      nextBtn.classList.remove('absolute', 'right-0', 'top-0', 'h-full', 'w-[10%]', 'bg-black', 'bg-opacity-30', 'flex', 'items-center', 'justify-center');
+      nextBtn.classList.remove('absolute', 'left-0', 'top-0', 'h-full', 'w-[10%]', 'bg-black', 'bg-opacity-30', 'flex', 'items-center', 'justify-center');
       nextBtn.classList.add('text-4xl', 'right-10');
     }
   }
@@ -153,6 +154,7 @@
   // Update posisi tombol saat resize
   window.addEventListener('resize', updateButtonPosition);
   document.addEventListener('DOMContentLoaded', updateButtonPosition);
+
 
   </script>
 
