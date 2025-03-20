@@ -155,7 +155,50 @@
   window.addEventListener('resize', updateButtonPosition);
   document.addEventListener('DOMContentLoaded', updateButtonPosition);
 
+  document.addEventListener("DOMContentLoaded", () => {
+  const preloadBtn = document.createElement("button");
+  preloadBtn.id = "preloadBtn";
+  preloadBtn.classList.add("bg-yellow-500", "p-2", "rounded", "mb-4");
+  preloadBtn.innerText = "Preload Media";
+  
+  const imageGrid = document.getElementById("imageGrid");
+  imageGrid.insertBefore(preloadBtn, imageGrid.children[1]);
 
+  preloadBtn.addEventListener("click", () => {
+    preloadBtn.innerText = "Preloading...";
+    preloadBtn.disabled = true;
+    preloadMedia().then(() => {
+      preloadBtn.innerText = "Preloaded!";
+      setTimeout(() => {
+        preloadBtn.innerText = "Preload Media";
+        preloadBtn.disabled = false;
+      }, 2000);
+    });
+  });
+});
+
+function preloadMedia() {
+  return new Promise((resolve) => {
+    const mediaElements = document.querySelectorAll("#grid img");
+    let loadedCount = 0;
+    
+    if (mediaElements.length === 0) {
+      resolve();
+      return;
+    }
+
+    mediaElements.forEach((img) => {
+      const image = new Image();
+      image.src = img.src;
+      image.onload = () => {
+        loadedCount++;
+        if (loadedCount === mediaElements.length) {
+          resolve();
+        }
+      };
+    });
+  });
+}
   </script>
 
   <script src="script.js"></script>
