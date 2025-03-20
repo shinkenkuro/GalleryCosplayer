@@ -66,43 +66,91 @@ function loadCosplayer(jsonFile) {
 
 // Function to populate folder list from JSON data
 function populateFolders(jsonData) {
-  folderList.innerHTML = ''; // Clear any previous folders
+  folderList.innerHTML = ''; // Hapus folder sebelumnya
   folderList.classList.remove('hidden');
   imageGrid.classList.add('hidden');
 
   jsonData.folders.forEach(folder => {
     const folderDiv = document.createElement('div');
-    folderDiv.classList.add('bg-gray-700', 'p-4', 'rounded-lg', 'cursor-pointer', 'hover:bg-gray-600');
-    folderDiv.innerText = folder;
+    folderDiv.classList.add('bg-gray-700', 'p-4', 'rounded-lg', 'cursor-pointer', 'hover:bg-gray-600', 'flex', 'flex-col', 'items-center');
+
+    // Ambil gambar pertama jika tersedia dan bersihkan teks tambahan
+    let firstImage = jsonData.images[folder] ? jsonData.images[folder][0] : null;
+    if (firstImage) {
+      firstImage = firstImage.split(" ")[0]; // Hanya ambil URL tanpa tambahan teks
+
+      const imgElement = document.createElement('img');
+      imgElement.src = firstImage;
+      imgElement.alt = folder;
+      imgElement.classList.add('w-full', 'h-40', 'object-cover', 'rounded-md', 'mb-2');
+      folderDiv.appendChild(imgElement);
+    }
+
+    // Tambahkan teks nama folder
+    const folderText = document.createElement('p');
+    folderText.innerText = folder;
+    folderText.classList.add('text-center', 'text-white', 'font-medium');
+    folderDiv.appendChild(folderText);
+
+    // Tambahkan event klik
     folderDiv.addEventListener('click', () => showMedia(folder, jsonData));
+
     folderList.appendChild(folderDiv);
   });
 }
+
+
 
 // Function to handle sorting options
 function setupSortListener(jsonData) {
   sortFolders.addEventListener('change', (event) => {
     const sortOption = event.target.value;
-    let sortedFolders = [...jsonData.folders]; // Make a copy of the folders list
+    let sortedFolders = [...jsonData.folders]; // Salin data folders
 
-    // Sort folders based on selected option
+    // Sorting berdasarkan opsi yang dipilih
     if (sortOption === 'asc') {
-      sortedFolders.sort(); // Sort A-Z
+      sortedFolders.sort(); // Urutkan A-Z
     } else if (sortOption === 'desc') {
-      sortedFolders.sort().reverse(); // Sort Z-A
+      sortedFolders.sort().reverse(); // Urutkan Z-A
+    } else if (sortOption === 'newest') {
+      sortedFolders = [...jsonData.folders].reverse(); // Terbaru (urutan JSON dibalik)
+    } else if (sortOption === 'oldest') {
+      sortedFolders = [...jsonData.folders]; // Terlama (sesuai urutan JSON asli)
     }
 
-    // Re-populate folder list after sorting
+    // Hapus daftar lama dan tambahkan yang baru
     folderList.innerHTML = '';
     sortedFolders.forEach(folder => {
       const folderDiv = document.createElement('div');
-      folderDiv.classList.add('bg-gray-700', 'p-4', 'rounded-lg', 'cursor-pointer', 'hover:bg-gray-600');
-      folderDiv.innerText = folder;
+      folderDiv.classList.add('bg-gray-700', 'p-4', 'rounded-lg', 'cursor-pointer', 'hover:bg-gray-600', 'flex', 'flex-col', 'items-center');
+
+      // Ambil gambar pertama jika tersedia dan bersihkan teks tambahan
+      let firstImage = jsonData.images[folder] ? jsonData.images[folder][0] : null;
+      if (firstImage) {
+        firstImage = firstImage.split(" ")[0]; // Hanya ambil URL tanpa tambahan teks
+
+        const imgElement = document.createElement('img');
+        imgElement.src = firstImage;
+        imgElement.alt = folder;
+        imgElement.classList.add('w-full', 'h-40', 'object-cover', 'rounded-md', 'mb-2');
+        folderDiv.appendChild(imgElement);
+      }
+
+      // Tambahkan teks nama folder
+      const folderText = document.createElement('p');
+      folderText.innerText = folder;
+      folderText.classList.add('text-center', 'text-white', 'font-medium');
+      folderDiv.appendChild(folderText);
+
+      // Tambahkan event klik
       folderDiv.addEventListener('click', () => showMedia(folder, jsonData));
+
       folderList.appendChild(folderDiv);
     });
   });
 }
+
+
 
 // Function to display media for a selected folder
 function showMedia(folder, jsonData) {
