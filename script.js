@@ -184,6 +184,7 @@ function renderMediaGrid(media) {
       mediaElement.classList.add('w-40', 'h-auto', 'rounded-lg');
       mediaElement.src = url;
       mediaElement.alt = title || `Media ${index + 1}`;
+      mediaElement.dataset.originalUrl = url; // Store original URL for toggling
     }
 
     const filename = document.createElement('p');
@@ -196,6 +197,38 @@ function renderMediaGrid(media) {
     grid.appendChild(mediaDiv);
   });
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  const toggleAllBtn = document.createElement("button");
+  toggleAllBtn.id = "toggleAllBtn";
+  toggleAllBtn.classList.add("bg-red-500", "p-2", "rounded", "mb-4", "text-white");
+  toggleAllBtn.textContent = "Change to MD";
+  
+  document.getElementById("imageGrid").insertBefore(toggleAllBtn, document.getElementById("grid"));
+  
+  toggleAllBtn.addEventListener("click", () => {
+    const images = document.querySelectorAll("#grid img");
+    let isCurrentlyMD = [...images].some(img => img.src.includes(".md."));
+    
+    images.forEach(img => {
+      let originalUrl = img.dataset.originalUrl;
+      if (isCurrentlyMD) {
+        img.src = originalUrl.replace(/\.md(\.[a-zA-Z0-9]+)$/, "$1");
+        img.dataset.originalUrl = img.src;
+      } else {
+        img.src = originalUrl.replace(/(\.[a-zA-Z0-9]+)$/, ".md$1");
+        img.dataset.originalUrl = img.src;
+      }
+    });
+    
+    toggleAllBtn.textContent = isCurrentlyMD ? "Change to MD" : "Change to HD";
+    
+    if (window.currentFolder) {
+      renderMediaGrid(window.currentFolder); // Refresh images based on the current folder
+    }
+  });
+});
+
 
 // Event listener for shuffle button
 shuffleBtn.addEventListener('click', () => {
