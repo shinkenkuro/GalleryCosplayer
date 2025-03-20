@@ -50,7 +50,8 @@
     <div id="imageGrid" class="hidden">
       <button id="backBtn" class="bg-blue-500 p-2 rounded mb-4">Back to Folders</button>
       <button id="shuffleBtn" class="bg-green-500 p-2 rounded mb-4">Shuffle Media</button>
-      <div id="grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-6"></div>
+      <button id="toggleGridMode" class="bg-purple-500 p-2 rounded mb-4 text-white">Enable Full Scroll Mode</button>
+      <div id="grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-x-6 gap-y-6"></div>
     </div>
 
     <!-- Slideshow Overlay -->
@@ -199,6 +200,37 @@ function preloadMedia() {
     });
   });
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  const toggleGridModeBtn = document.getElementById("toggleGridMode");
+  let isFullScroll = false;
+
+  toggleGridModeBtn.addEventListener("click", () => {
+    const grid = document.getElementById("grid");
+    const images = grid.querySelectorAll("img");
+    
+    if (isFullScroll) {
+      grid.classList.remove("flex", "flex-col", "items-center", "w-screen");
+      grid.classList.add("grid", "grid-cols-2", "sm:grid-cols-3", "md:grid-cols-4", "lg:grid-cols-8",  "gap-x-6", "gap-y-6");
+      images.forEach(img => {
+        img.classList.remove("w-screen", "h-auto");
+        img.parentElement.classList.add("relative", "bg-gray-800", "p-4", "rounded-lg");
+      });
+      toggleGridModeBtn.textContent = "Enable Full Scroll Mode";
+    } else {
+      grid.classList.remove("grid", "grid-cols-2", "sm:grid-cols-3", "md:grid-cols-4", "lg:grid-cols-8", "gap-x-6", "gap-y-6");
+      grid.classList.add("flex", "flex-col", "w-screen");
+      images.forEach(img => {
+        img.classList.add("w-screen", "h-auto");
+        if (img.parentElement) {
+          img.parentElement.replaceWith(img); // Remove wrapper div
+        }
+      });
+      toggleGridModeBtn.textContent = "Disable Full Scroll Mode";
+    }
+    isFullScroll = !isFullScroll;
+  });
+});
   </script>
 
   <script src="script.js"></script>
