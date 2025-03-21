@@ -167,8 +167,11 @@ function showMedia(folder, jsonData) {
 }
 
 // Function to render media grid
+let loadingCancelled = false; // Status untuk menghentikan proses loading
+
 async function renderMediaGrid(media) {
   grid.innerHTML = ''; // Kosongkan kontainer sebelum mengisi ulang
+  loadingCancelled = false; // Reset status saat fungsi dipanggil
 
   window.currentMedia = media; // Simpan daftar media yang sedang ditampilkan
 
@@ -176,15 +179,19 @@ async function renderMediaGrid(media) {
   const totalBatches = Math.ceil(media.length / batchSize);
 
   for (let batchIndex = 0; batchIndex < totalBatches; batchIndex++) {
-    const batch = media.slice(batchIndex * batchSize, (batchIndex + 1) * batchSize);
+    if (loadingCancelled) {
+      console.log("Proses loading dibatalkan.");
+      return; // Hentikan eksekusi jika tombol Back ditekan
+    }
 
+    const batch = media.slice(batchIndex * batchSize, (batchIndex + 1) * batchSize);
     console.log(`Loading batch ${batchIndex + 1} of ${totalBatches}`);
 
-    // Tunggu sampai batch selesai dimuat sebelum lanjut ke batch berikutnya
     const mediaElements = await Promise.all(
       batch.map(async (mediaData, index) => {
-        const { url, title, type } = parseMediaData(mediaData);
+        if (loadingCancelled) return null; // Hentikan jika loading dibatalkan
 
+        const { url, title, type } = parseMediaData(mediaData);
         const mediaDiv = document.createElement('div');
         mediaDiv.classList.add('relative', 'bg-gray-800', 'p-4', 'rounded-lg');
 
@@ -194,15 +201,16 @@ async function renderMediaGrid(media) {
         } else {
           mediaElement = document.createElement('img');
           mediaElement.classList.add('w-40', 'h-auto', 'rounded-lg');
-          mediaElement.dataset.originalUrl = url; // Simpan URL asli untuk toggle
+          mediaElement.dataset.originalUrl = url;
           mediaElement.alt = title || `Media ${index + 1}`;
 
-          // Tunggu sampai gambar selesai dimuat sebelum lanjut
           await new Promise((resolve, reject) => {
+            if (loadingCancelled) return resolve(); // Jika loading dibatalkan, lanjutkan
+
             mediaElement.onload = resolve;
             mediaElement.onerror = () => {
               console.warn(`Gagal memuat gambar: ${url}`);
-              resolve(); // Jangan hentikan proses hanya karena 1 gambar gagal
+              resolve();
             };
             mediaElement.src = url; // Setel src setelah event listener
           });
@@ -216,16 +224,24 @@ async function renderMediaGrid(media) {
         mediaDiv.appendChild(filename);
         mediaDiv.addEventListener('click', () => openSlideshow(index, media));
 
-        return mediaDiv; // Kembalikan elemen yang telah selesai dimuat
+        return mediaDiv;
       })
     );
 
-    // Setelah semua gambar di batch ini siap, tambahkan ke grid
-    mediaElements.forEach((element) => grid.appendChild(element));
-  }
+    if (loadingCancelled) return; // Jika loading dibatalkan setelah satu batch selesai, hentikan
 
-  console.log("Semua gambar telah dimuat.");
+    mediaElements.forEach((element) => {
+      if (element) grid.appendChild(element);
+    });
+  }
 }
+
+// Tambahkan event listener untuk tombol Back
+document.getElementById("backBtn").addEventListener("click", () => {
+  console.log("Tombol Back ditekan, membatalkan loading...");
+  loadingCancelled = true;
+  grid.innerHTML = ""; // Kosongkan grid agar tidak ada elemen yang tersisa
+});
 
 
 document.addEventListener("DOMContentLoaded", () => {
