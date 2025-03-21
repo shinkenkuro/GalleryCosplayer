@@ -177,6 +177,7 @@ async function renderMediaGrid(media) {
 
   const batchSize = 100; // Jumlah gambar per batch
   const totalBatches = Math.ceil(media.length / batchSize);
+  let globalIndex = 0; // Indeks global untuk mempertahankan urutan gambar
 
   for (let batchIndex = 0; batchIndex < totalBatches; batchIndex++) {
     if (loadingCancelled) {
@@ -188,7 +189,7 @@ async function renderMediaGrid(media) {
     console.log(`Loading batch ${batchIndex + 1} of ${totalBatches}`);
 
     const mediaElements = await Promise.all(
-      batch.map(async (mediaData, index) => {
+      batch.map(async (mediaData) => {
         if (loadingCancelled) return null; // Hentikan jika loading dibatalkan
 
         const { url, title, type } = parseMediaData(mediaData);
@@ -202,7 +203,7 @@ async function renderMediaGrid(media) {
           mediaElement = document.createElement('img');
           mediaElement.classList.add('w-40', 'h-auto', 'rounded-lg');
           mediaElement.dataset.originalUrl = url;
-          mediaElement.alt = title || `Media ${index + 1}`;
+          mediaElement.alt = title || `Media ${globalIndex + 1}`;
 
           await new Promise((resolve, reject) => {
             if (loadingCancelled) return resolve(); // Jika loading dibatalkan, lanjutkan
@@ -218,11 +219,13 @@ async function renderMediaGrid(media) {
 
         const filename = document.createElement('p');
         filename.classList.add('text-center', 'mt-2', 'text-sm');
-        filename.innerText = title || `Media ${index + 1}`;
+        filename.innerText = title || `Media ${globalIndex + 1}`;
 
         mediaDiv.appendChild(mediaElement);
         mediaDiv.appendChild(filename);
-        mediaDiv.addEventListener('click', () => openSlideshow(index, media));
+        mediaDiv.addEventListener('click', () => openSlideshow(globalIndex, media));
+
+        globalIndex++; // Naikkan indeks global setelah menambahkan media
 
         return mediaDiv;
       })
@@ -234,6 +237,8 @@ async function renderMediaGrid(media) {
       if (element) grid.appendChild(element);
     });
   }
+
+  console.log("Semua gambar telah dimuat.");
 }
 
 // Tambahkan event listener untuk tombol Back
@@ -242,6 +247,7 @@ document.getElementById("backBtn").addEventListener("click", () => {
   loadingCancelled = true;
   grid.innerHTML = ""; // Kosongkan grid agar tidak ada elemen yang tersisa
 });
+
 
 
 document.addEventListener("DOMContentLoaded", () => {
