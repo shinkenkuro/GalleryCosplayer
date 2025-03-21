@@ -177,7 +177,6 @@ async function renderMediaGrid(media) {
 
   const batchSize = 100; // Jumlah gambar per batch
   const totalBatches = Math.ceil(media.length / batchSize);
-  let globalIndex = 0; // Indeks global untuk mempertahankan urutan gambar
 
   for (let batchIndex = 0; batchIndex < totalBatches; batchIndex++) {
     if (loadingCancelled) {
@@ -185,14 +184,17 @@ async function renderMediaGrid(media) {
       return; // Hentikan eksekusi jika tombol Back ditekan
     }
 
-    const batch = media.slice(batchIndex * batchSize, (batchIndex + 1) * batchSize);
+    const batchStartIndex = batchIndex * batchSize; // Mulai indeks untuk batch ini
+    const batch = media.slice(batchStartIndex, batchStartIndex + batchSize);
     console.log(`Loading batch ${batchIndex + 1} of ${totalBatches}`);
 
     const mediaElements = await Promise.all(
-      batch.map(async (mediaData) => {
+      batch.map(async (mediaData, batchLocalIndex) => {
         if (loadingCancelled) return null; // Hentikan jika loading dibatalkan
 
+        const realIndex = batchStartIndex + batchLocalIndex; // Indeks global dalam array media
         const { url, title, type } = parseMediaData(mediaData);
+
         const mediaDiv = document.createElement('div');
         mediaDiv.classList.add('relative', 'bg-gray-800', 'p-4', 'rounded-lg');
 
@@ -203,7 +205,7 @@ async function renderMediaGrid(media) {
           mediaElement = document.createElement('img');
           mediaElement.classList.add('w-40', 'h-auto', 'rounded-lg');
           mediaElement.dataset.originalUrl = url;
-          mediaElement.alt = title || `Media ${globalIndex + 1}`;
+          mediaElement.alt = title || `Media ${realIndex + 1}`;
 
           await new Promise((resolve, reject) => {
             if (loadingCancelled) return resolve(); // Jika loading dibatalkan, lanjutkan
@@ -219,13 +221,11 @@ async function renderMediaGrid(media) {
 
         const filename = document.createElement('p');
         filename.classList.add('text-center', 'mt-2', 'text-sm');
-        filename.innerText = title || `Media ${globalIndex + 1}`;
+        filename.innerText = title || `Media ${realIndex + 1}`;
 
         mediaDiv.appendChild(mediaElement);
         mediaDiv.appendChild(filename);
-        mediaDiv.addEventListener('click', () => openSlideshow(globalIndex, media));
-
-        globalIndex++; // Naikkan indeks global setelah menambahkan media
+        mediaDiv.addEventListener('click', () => openSlideshow(realIndex, media)); // Pastikan indeks benar
 
         return mediaDiv;
       })
@@ -247,6 +247,7 @@ document.getElementById("backBtn").addEventListener("click", () => {
   loadingCancelled = true;
   grid.innerHTML = ""; // Kosongkan grid agar tidak ada elemen yang tersisa
 });
+
 
 
 
