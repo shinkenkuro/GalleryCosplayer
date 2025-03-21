@@ -167,37 +167,66 @@ function showMedia(folder, jsonData) {
 }
 
 // Function to render media grid
-function renderMediaGrid(media) {
-  grid.innerHTML = ''; // Clear existing content
+async function renderMediaGrid(media) {
+  grid.innerHTML = ''; // Kosongkan kontainer sebelum mengisi ulang
 
-  media.forEach((mediaData, index) => {
-    const { url, title, type } = parseMediaData(mediaData);
+  window.currentMedia = media; // Simpan daftar media yang sedang ditampilkan
 
-    const mediaDiv = document.createElement('div');
-    mediaDiv.classList.add('relative', 'bg-gray-800', 'p-4', 'rounded-lg');
+  const batchSize = 100; // Jumlah gambar per batch
+  const totalBatches = Math.ceil(media.length / batchSize);
 
-    let mediaElement;
-    if (type === 'video') {
-      mediaElement = createVideoElement(url);
-    } else {
-      mediaElement = document.createElement('img');
-      mediaElement.classList.add('w-40', 'h-auto', 'rounded-lg');
-      mediaElement.src = url;
-      mediaElement.alt = title || `Media ${index + 1}`;
-      mediaElement.dataset.originalUrl = url; // Store original URL for toggling
-    }
+  for (let batchIndex = 0; batchIndex < totalBatches; batchIndex++) {
+    const batch = media.slice(batchIndex * batchSize, (batchIndex + 1) * batchSize);
 
-    const filename = document.createElement('p');
-    filename.classList.add('text-center', 'mt-2', 'text-sm');
-    filename.innerText = title || `Media ${index + 1}`;
+    console.log(`Loading batch ${batchIndex + 1} of ${totalBatches}`);
 
-    mediaDiv.appendChild(mediaElement);
-    mediaDiv.appendChild(filename);
-    mediaDiv.addEventListener('click', () => openSlideshow(index, media));
-    grid.appendChild(mediaDiv);
-  });
-  window.currentMedia = media;
+    // Tunggu sampai batch selesai dimuat sebelum lanjut ke batch berikutnya
+    const mediaElements = await Promise.all(
+      batch.map(async (mediaData, index) => {
+        const { url, title, type } = parseMediaData(mediaData);
+
+        const mediaDiv = document.createElement('div');
+        mediaDiv.classList.add('relative', 'bg-gray-800', 'p-4', 'rounded-lg');
+
+        let mediaElement;
+        if (type === 'video') {
+          mediaElement = createVideoElement(url);
+        } else {
+          mediaElement = document.createElement('img');
+          mediaElement.classList.add('w-40', 'h-auto', 'rounded-lg');
+          mediaElement.dataset.originalUrl = url; // Simpan URL asli untuk toggle
+          mediaElement.alt = title || `Media ${index + 1}`;
+
+          // Tunggu sampai gambar selesai dimuat sebelum lanjut
+          await new Promise((resolve, reject) => {
+            mediaElement.onload = resolve;
+            mediaElement.onerror = () => {
+              console.warn(`Gagal memuat gambar: ${url}`);
+              resolve(); // Jangan hentikan proses hanya karena 1 gambar gagal
+            };
+            mediaElement.src = url; // Setel src setelah event listener
+          });
+        }
+
+        const filename = document.createElement('p');
+        filename.classList.add('text-center', 'mt-2', 'text-sm');
+        filename.innerText = title || `Media ${index + 1}`;
+
+        mediaDiv.appendChild(mediaElement);
+        mediaDiv.appendChild(filename);
+        mediaDiv.addEventListener('click', () => openSlideshow(index, media));
+
+        return mediaDiv; // Kembalikan elemen yang telah selesai dimuat
+      })
+    );
+
+    // Setelah semua gambar di batch ini siap, tambahkan ke grid
+    mediaElements.forEach((element) => grid.appendChild(element));
+  }
+
+  console.log("Semua gambar telah dimuat.");
 }
+
 
 document.addEventListener("DOMContentLoaded", () => {
   const toggleAllBtn = document.createElement("button");
